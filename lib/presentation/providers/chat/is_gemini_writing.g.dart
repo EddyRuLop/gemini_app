@@ -6,7 +6,7 @@ part of 'is_gemini_writing.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$isGeminiWritingHash() => r'5eaa3c858c2e9437417235be50cf9a59b3e4c6f6';
+String _$isGeminiWritingHash() => r'3d7084bd42f8076a082315a685d05a4958d73650';
 
 /// See also [IsGeminiWriting].
 @ProviderFor(IsGeminiWriting)

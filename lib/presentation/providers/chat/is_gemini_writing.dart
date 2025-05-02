@@ -5,7 +5,7 @@ part 'is_gemini_writing.g.dart';
 @riverpod
 class IsGeminiWriting extends _$IsGeminiWriting {
   @override
-  bool build() => true;
+  bool build() => false;
 
   void setIsWriting() {
     state = true;
