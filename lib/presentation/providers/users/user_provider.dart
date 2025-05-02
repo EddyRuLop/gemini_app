@@ -15,3 +15,16 @@ User geminiUser(Ref ref) {
 
   return geminiUser;
 }
+
+@riverpod
+User user(Ref ref) {
+  final user = User(
+    id: 'user-id-abc',
+    firstName: 'Eduardo',
+    lastName: 'Ruiz',
+    imageUrl:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgpnmY-O9iz09Jka-vGvK2Lv-U-pL3H18CfA&s',
+  );
+
+  return user;
+}
