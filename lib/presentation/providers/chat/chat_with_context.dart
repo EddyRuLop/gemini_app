@@ -6,20 +6,22 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart';
 
 import 'package:gemini_app/config/gemini/gemini_impl.dart';
-import 'package:gemini_app/presentation/providers/chat/is_gemini_writing.dart';
 
-part 'basic_chat.g.dart';
+part 'chat_with_context.g.dart';
 
 final uuid = Uuid();
 
-@riverpod
-class BasicChat extends _$BasicChat {
+@Riverpod(keepAlive: true)
+class ChatWithContext extends _$ChatWithContext {
   final gemini = GeminiImpl();
+
   late User geminiUser;
+  late String chatId;
 
   @override
   List<Message> build() {
     geminiUser = ref.read(geminiUserProvider);
+    chatId = uuid.v4();
     return [];
   }
 
@@ -38,7 +40,6 @@ class BasicChat extends _$BasicChat {
 
   void _addTextMessage(PartialText partialText, User author) {
     _createTextMessage(partialText.text, author);
-    // _geminiTextResponse(partialText.text);
     _geminiTextResponseStream(partialText.text);
   }
 
@@ -54,18 +55,7 @@ class BasicChat extends _$BasicChat {
     await Future.delayed(Duration(milliseconds: 10));
 
     _createTextMessage(partialText.text, author);
-
-    // _geminiTextResponse(partialText.text);
     _geminiTextResponseStream(partialText.text, images: images);
-  }
-
-  void _geminiTextResponse(String prompt) async {
-    _setGeminiWritingStatus(true);
-
-    final textResponse = await gemini.getResponse(prompt);
-
-    _setGeminiWritingStatus(false);
-    _createTextMessage(textResponse, geminiUser);
   }
 
   void _geminiTextResponseStream(
@@ -74,7 +64,7 @@ class BasicChat extends _$BasicChat {
   }) async {
     _createTextMessage('Gemini está pensando...', geminiUser);
 
-    gemini.getResponseStream(prompt, files: images).listen((responseChunk) {
+    gemini.getChatStream(prompt, chatId, files: images).listen((responseChunk) {
       if (responseChunk.isEmpty) return;
 
       final updatedMessages = [...state];
@@ -85,11 +75,18 @@ class BasicChat extends _$BasicChat {
       updatedMessages[0] = updatedMessage;
       state = updatedMessages;
     });
-
-    // _createTextMessage(textResponse, geminiUser);
   }
 
   // Helper methods
+  void newChat() {
+    chatId = uuid.v4();
+    state = [];
+  }
+
+  void loadPreviousMessages(String chatId) {
+    //todo:
+  }
+
   void _createTextMessage(String text, User author) {
     final message = TextMessage(
       id: uuid.v4(),
@@ -112,12 +109,5 @@ class BasicChat extends _$BasicChat {
     );
 
     state = [message, ...state];
-  }
-
-  void _setGeminiWritingStatus(bool isWriting) {
-    final isGeminiWriting = ref.read(isGeminiWritingProvider.notifier);
-    isWriting
-        ? isGeminiWriting.setIsWriting()
-        : isGeminiWriting.setIsNotWriting();
   }
 }
